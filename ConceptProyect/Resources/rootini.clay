@@ -1,0 +1,10 @@
+
+class serverService {
+    func onPlayerConect(player) {
+        if (instanceof(player, IPlayer)) {
+            
+        } else {
+            print("Error: Player not valid");
+        }
+    }
+}

@@ -1,0 +1,6 @@
+
+interface IRoot {
+    var childs: List;
+    var getService: any;
+}
+

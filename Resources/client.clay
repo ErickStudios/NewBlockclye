@@ -1,0 +1,15 @@
+interface IColor {
+    var r: number;
+    var g: number;
+    var b: number;
+}
+
+classfunc Color(r, g, b) extends IColor {
+    var cls = Object();
+
+    cls.set("r", r);
+    cls.set("g", g);
+    cls.set("b", b);
+
+    return cls;
+}

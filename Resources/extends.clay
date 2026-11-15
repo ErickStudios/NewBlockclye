@@ -1,0 +1,19 @@
+// List function for extends the Array
+classfunc List() {
+    var object = Object();
+
+    object.set("length", 0);
+
+    // list.push(list, item);
+    object.set("push", func(object, item) {
+        object.set(repr(object.length), item);
+        object.set("length", Math.add(object.length, 1));
+    });
+    // list.pop(list);
+    object.set("pop", func(object) {
+        object.set("length", Math.sub(object.length, 1));
+        return object.get(repr(object.length));
+    });
+
+    return object;
+}

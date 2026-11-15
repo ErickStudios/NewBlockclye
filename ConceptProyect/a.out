@@ -1,0 +1,9 @@
+
+var _resModel = List();
+_resModel.push(_resModel, "
+    %ball 0 0 0 0.5 255 0 0
+    %cube -1 0 0 0.5 0.5 0.5 0 255 0
+    %cube 1 0 0 0.5 0.5 0.5 0 255 255");
+var ResourcesPrefabs = Object();
+ResourcesPrefabs.set("table.rsc", _resModel.get("0"));
+

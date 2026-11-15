@@ -1,0 +1,24 @@
+
+interface IThreeJS {
+    var __ithreeJSIdentValider: any;
+}
+
+interface IWebJS {
+    var __iwebJSIdentValider: any;
+    var nextFrameRequester: any;
+    var set: any;
+    var get: any;
+}
+
+func render(items) {
+}
+
+if (instanceof(ThreeJS, IThreeJS)) {
+    if (instanceof(WebJS, IWebJS)) {
+        WebJS.set("nextFrameRequester", render);
+    } else {
+        print("invalid web imported");
+    }
+} else {
+    print("invalid three.js");
+}
