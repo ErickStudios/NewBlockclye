@@ -1,6 +1,6 @@
 // Orientation of a object
-interface IOrientator extends IVector3 {
-    var rotation: Vector3;
+interface IOrientator extends IVector2 {
+    var rotation: IVector2;
 }
 
 // Constructor for orientator
@@ -8,17 +8,17 @@ classfunc Orientator(_pos, _lookat) extends IOrientator {
     var _tmp = Object();
 
     // Check and fix pos
-    if (instanceof(_pos, IVector3)) {
+    if (instanceof(_pos, IVector2)) {
         _tmp.set("pos", _pos);
     } else {
-        _tmp.set("pos", WorldMath.zero3());
+        _tmp.set("pos", WorldMath.zero());
     }
 
     // Check and fix rotation
-    if (instanceof(_lookat, IVector3)) {
+    if (instanceof(_lookat, IVector2)) {
         _tmp.set("lookat", _lookat);
     } else {
-        _tmp.set("lookat", WorldMath.zero3());
+        _tmp.set("lookat", WorldMath.zero());
     }
 
     // instance
@@ -28,7 +28,7 @@ classfunc Orientator(_pos, _lookat) extends IOrientator {
     return pos;
 }
 
-// A thing in the world 3d space
+// A thing in the world 2d space
 interface SpacedThing {
     var origin: IOrientator;
 }
@@ -36,23 +36,9 @@ interface SpacedThing {
 // A Base Of Body
 interface BaseBody extends SpacedThing {
     var nofall: boolean;
-    var linearVelocity: IVector3;
+    var linearVelocity: IVector2;
     var color: IColor;
     var orientator: IOrientator;
     var mass: number;
-    var size: IVector3;
-}
-
-// The player interface
-interface IPlayer {
-    var name: string;
-}
-
-// Player instancer
-classfunc Player(name) extends IPlayer {
-    var cls = Object();
-
-    this.set("name", name);
-
-    return cls;
+    var size: IVector2;
 }

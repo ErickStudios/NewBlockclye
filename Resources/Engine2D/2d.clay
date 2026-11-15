@@ -1,0 +1,78 @@
+
+// Vector 2 (X,Y)
+interface IVector2 {
+    var x: number;
+    var y: number;
+}
+
+// Vector2(X,Y)
+classfunc Vector2(x, y) extends IVector2 {
+    var cls = Object();
+
+    cls.set("x", x);
+    cls.set("y", y);
+
+    return cls;
+}
+
+var WorldMath = Object();
+
+WorldMath.set("zero", func() { return Vector2(0, 0); });
+WorldMath.set("one", func() { return Vector2(1, 1); });
+
+// Vector2 + Vector2
+WorldMath.set("add", func(a, b) {
+    if (instanceof(a, IVector2)) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.add(a.x, b.x),Math.add(a.y, b.y));
+        }
+    }
+
+    return Vector2();
+});
+
+// Vector2 - Vector2
+WorldMath.set("sub", func(a, b) {
+    if (instanceof(a, IVector2)) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.sub(a.x, b.x),Math.sub(a.y, b.y));
+        }
+    }
+
+    return Vector2();
+});
+
+// Vector2 * Vector2
+WorldMath.set("mul", func(a, b) {
+    if (instanceof(a, IVector2)) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.mul(a.x, b.x),Math.mul(a.y, b.y));
+        }
+    }
+
+    return Vector2();
+});
+
+// Vector2 / Vector2
+WorldMath.set("div", func(a, b) {
+    if (instanceof(a, IVector2)) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.div(a.x, b.x),Math.div(a.y, b.y));
+        }
+    }
+
+    return Vector2();
+});
+
+// Vector2 * number
+WorldMath.set("muln", func(a, b) {
+    return WorldMath.mul(a, Vector2(b, b));
+});
+
+// Vector2 / number
+WorldMath.set("divn", func(a, b) {
+    return WorldMath.div(a, Vector2(b, b));
+});
+
+exportToGlobal("WorldMath", WorldMath);
+exportToGlobal("IVector2", IVector2);

@@ -49,7 +49,6 @@ export function createEditor(ax) {
             let interfaces = [...code.matchAll(/\binterface\s+(\w+)/g)].map(v => v[1]);
             let classesfuncs = [...code.matchAll(/\bclassfunc\s+(\w+)/g)].map(v => v[1]);
 
-            console.log(vars)
             let objects = [...code.matchAll(/\bvar\b\s+(\w+)\s+=\s+ServerToInit.virtualWorkspace.importScene\(/g)].map(v => v[1]);
             let objectsInstancied = [...code.matchAll(/\bvar\b\s+(\w+)\s+=\s+ServerToInit.virtualWorkspace.addChild\(/g)].map(v => v[1]);
             let instancies = [];
@@ -99,7 +98,6 @@ export function createEditor(ax) {
                         [/"[^"]*"/, "entity.flat.string"],
                         [/\b\d+\b/, "entity.flat.number"],
                         [/\b(extends|class|interface|return|classfunc|var|func|if|else)\b/, "keyword"],
-                        [/\b(SimpleBlk|RigidPart|StaticPart|Group|Vector3|SerializableObject|Color3|Vector2|ButtonStyles|UiProximation|TextAlign|SimpleRectangle|SimpleTextBlks|SimpleButton)\b/, "entity.class.builtin"],
                         ...dynamicRule,
                         ...instancies,
                         [/\b(Array|InternalDocsStrictEnum|Boolean|boolean|String|string|Number|number|Math|Object)\b/, "entity.class.lang"],

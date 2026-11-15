@@ -1,0 +1,44 @@
+// Orientation of a object
+interface IOrientator extends IVector3 {
+    var rotation: Vector3;
+}
+
+// Constructor for orientator
+classfunc Orientator(_pos, _lookat) extends IOrientator {
+    var _tmp = Object();
+
+    // Check and fix pos
+    if (instanceof(_pos, IVector3)) {
+        _tmp.set("pos", _pos);
+    } else {
+        _tmp.set("pos", WorldMath.zero3());
+    }
+
+    // Check and fix rotation
+    if (instanceof(_lookat, IVector3)) {
+        _tmp.set("lookat", _lookat);
+    } else {
+        _tmp.set("lookat", WorldMath.zero3());
+    }
+
+    // instance
+    var pos = _tmp.pos;
+    pos.set("rotation", _tmp.lookat);
+    
+    return pos;
+}
+
+// A thing in the world 3d space
+interface SpacedThing {
+    var origin: IOrientator;
+}
+
+// A Base Of Body
+interface BaseBody extends SpacedThing {
+    var nofall: boolean;
+    var linearVelocity: IVector3;
+    var color: IColor;
+    var orientator: IOrientator;
+    var mass: number;
+    var size: IVector3;
+}

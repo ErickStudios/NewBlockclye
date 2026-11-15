@@ -19,11 +19,11 @@ classfunc Vector3(x, y, z) extends IVector3 {
 var WorldMath = Object();
 
 // Vectors For Operations
-WorldMath.set("zero3", func() { return Vector3(0,0,0); });
-WorldMath.set("one3", func() { return Vector3(1,1,1); });
+WorldMath.set("zero", func() { return Vector3(0,0,0); });
+WorldMath.set("one", func() { return Vector3(1,1,1); });
 
 // Vector3 + Vector3
-WorldMath.set("add3", func(a, b) {
+WorldMath.set("add", func(a, b) {
     if (instanceof(a, IVector3)) {
         if (instanceof(b, IVector3)) {
             return Vector3(Math.add(a.x, b.x),Math.add(a.y, b.y),Math.add(a.z, b.z));
@@ -34,7 +34,7 @@ WorldMath.set("add3", func(a, b) {
 });
 
 // Vector3 - Vector3
-WorldMath.set("sub3", func(a, b) {
+WorldMath.set("sub", func(a, b) {
     if (instanceof(a, IVector3)) {
         if (instanceof(b, IVector3)) {
             return Vector3(Math.sub(a.x, b.x),Math.sub(a.y, b.y),Math.sub(a.z, b.z));
@@ -45,7 +45,7 @@ WorldMath.set("sub3", func(a, b) {
 });
 
 // Vector3 * Vector3
-WorldMath.set("mul3", func(a, b) {
+WorldMath.set("mul", func(a, b) {
     if (instanceof(a, IVector3)) {
         if (instanceof(b, IVector3)) {
             return Vector3(Math.mul(a.x, b.x),Math.mul(a.y, b.y),Math.mul(a.z, b.z));
@@ -56,7 +56,7 @@ WorldMath.set("mul3", func(a, b) {
 });
 
 // Vector3 / Vector3
-WorldMath.set("div3", func(a, b) {
+WorldMath.set("div", func(a, b) {
     if (instanceof(a, IVector3)) {
         if (instanceof(b, IVector3)) {
             return Vector3(Math.div(a.x, b.x),Math.div(a.y, b.y),Math.div(a.z, b.z));
@@ -67,13 +67,13 @@ WorldMath.set("div3", func(a, b) {
 });
 
 // Vector3 * number
-WorldMath.set("muln3", func(a, n) {
-    return WorldMath.mul3(a, Vector3(n, n, n));
+WorldMath.set("muln", func(a, n) {
+    return WorldMath.mul(a, Vector3(n, n, n));
 });
 
 // Vector3 / number
-WorldMath.set("divn3", func(a, n) {
-    return WorldMath.div3(a, Vector3(n, n, n));
+WorldMath.set("divn", func(a, n) {
+    return WorldMath.div(a, Vector3(n, n, n));
 });
 
 exportToGlobal("WorldMath", WorldMath);
