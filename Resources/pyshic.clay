@@ -1,0 +1,137 @@
+
+// Class for the vectors
+classfunc Vector2(X, Y) extends IVector2 {
+    var cls = Object();
+    cls.set("X", X);
+    cls.set("Y", Y);
+
+    // Vector2 + Vector2
+    cls.set("_add", func(a, b) {
+        print(a, b);
+        return Vector2(Math.add(a.X, b.X),Math.add(a.Y, b.Y));
+    });
+    // Vector2 - Vector2
+    cls.set("_sub", func(a, b) {
+        return Vector2(Math.sub(a.X, b.X),Math.sub(a.Y, b.Y));
+    });
+    // Vector2 * Vector2
+    cls.set("_mul", func(a, b) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.mul(a.X, b.X),Math.mul(a.Y, b.Y));
+        }
+        return Math.mul(a, Vector2(b, b));
+    });
+    // Vector2 / Vector2
+    cls.set("_div", func(a, b) {
+        if (instanceof(b, IVector2)) {
+            return Vector2(Math.div(a.X, b.X),Math.div(a.Y, b.Y));
+        }
+        return Math.div(a, Vector2(b, b));
+    });
+
+    return cls;
+}
+
+// Position in 2d space
+classfunc Position(X, Y, Direction) extends IPosition2 {
+    var cls = Vector2(X, Y);
+    cls.set("Direction", Direction);
+    cls.set("Velocity", Vector2(0, 0));
+
+    return cls;
+}
+
+// Step one sprite at pyshic rules
+classfunc NextEnginerPyshic(posUpdate) extends IPosition2 {
+    if (instanceof(posUpdate, IPosition2)) {
+        posUpdate.set("X", Math.add(posUpdate.X, posUpdate.Velocity.X));
+        posUpdate.set("Y", Math.add(posUpdate.Y, posUpdate.Velocity.Y));
+        posUpdate.set("Velocity", Math.sub(posUpdate.Velocity, Math.mul(posUpdate.Velocity, 0.05)));
+    }
+    return posUpdate;
+}
+
+func projectVertices(v, axis) {
+    var cls = Object();
+    cls.set("min", 100000);
+    cls.set("max", Math.sub(0, cls.min));
+
+    for vertex in v {
+        var projection = Math.add(
+            Math.mul(vertex.X, axis.X), 
+            Math.mul(vertex.Y, axis.Y)
+        );
+
+        if (Math.less(projection, cls.min)) { 
+            cls.set("min", projection);
+        }
+        if (Math.greater(projection, cls.max)) {
+            cls.set("max", projection);
+        }
+    }
+
+    return cls;
+}
+
+// Verify if two projections overlaps
+func overlap(p1, p2) {
+  return Math.boolNot(Math.boolOr(Math.less(p1.max, p2.min), Math.less(p2.max, p1.min)));
+}
+
+func getVertices(rect) {
+  var cos = Math.cos(rect.Location.Direction);
+  var sin = Math.sin(rect.Location.Direction);
+  var hw = Math.div(rect.Size.X, 2);
+  var hh = Math.div(rect.Size.Y, 2);
+
+  var pos = rect.Location;
+
+  var locals = List(
+    Vector2(Math.sub(0, hw), Math.sub(0, hh)),
+    Vector2(hw, Math.sub(0, hh)),
+    Vector2(hw, hh),
+    Vector2(Math.sub(0, hw), hh)
+  );
+
+    return locals.map(locals, func(v, i) {
+        var vec = Vector2(
+            Math.sub(Math.mul(v.X, cos), Math.mul(v.Y, sin)), // X' = x*cos - y*sin
+            Math.add(Math.mul(v.X, sin), Math.mul(v.Y, cos))  // Y' = x*sin + y*cos  <-- Corregido
+        );
+        return Vector2(Math.add(pos.X, vec.X),Math.add(pos.Y, vec.Y));
+    });
+}
+
+func checkOBBCollision(rectA, rectB) {
+    var verticesA = getVertices(rectA);
+    var verticesB = getVertices(rectB);
+
+    var axes = List(
+        Vector2(Math.sub(verticesA.1.X, verticesA.0.X),Math.sub(verticesA.1.Y, verticesA.0.Y)),
+        Vector2(Math.sub(verticesA.3.X, verticesA.0.X),Math.sub(verticesA.3.Y, verticesA.0.Y)),
+        Vector2(Math.sub(verticesB.1.X, verticesB.0.X),Math.sub(verticesB.1.Y, verticesB.0.Y)),
+        Vector2(Math.sub(verticesB.3.X, verticesB.0.X),Math.sub(verticesB.3.Y, verticesB.0.Y))
+    );
+
+    for axis in axes {
+        var length = Math.hypot(axis.X, axis.Y);
+        var normAxis = Vector2(
+            Math.div(axis.X, length),
+            Math.div(axis.Y, length)
+        );
+
+        var pA = projectVertices(verticesA, normAxis);
+        var pB = projectVertices(verticesB, normAxis);
+
+        if (Math.boolNot(overlap(pA, pB))) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+print(checkOBBCollision(
+    Sprite2(Position(0,0,10), Vector2(1, 1)),
+    Sprite2(Position(0,0,10), Vector2(1, 1)),
+));

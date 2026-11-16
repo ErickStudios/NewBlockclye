@@ -24,7 +24,7 @@ export function ObjectDeserialize(obj) {
 
                 return async function autogen(scope, ...args) {
                     let factorizedArgs = args.map(ObjectFactorizer);
-                    let res = await func(factorizedArgs);
+                    let res = await func(factorizedArgs, scope);
                     return ObjectDeserialize(res);
                 };
             }

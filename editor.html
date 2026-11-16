@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monaco Editor</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        #container { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <!-- Contenedor obligatorio con tamaño definido -->
+    <div id="container"></div>
+
+    <!-- 1. Cargar el loader de Monaco desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+    <script>
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            monaco.languages.register({ id: 'myAsm' });
+
+            monaco.editor.defineTheme('myTheme', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: '#e36e82' },
+                    { token: 'keyword.control', foreground: '#C586C0'},
+                    { token: 'entity.scene', foreground: '#c0ecd9'},
+                    { token: 'entity.scene.prefactory', foreground: '#c0ecd9'},
+                    { token: 'entity.scene.factory', foreground: '#c0ecd9'},
+                    { token: 'entity.scene.element', foreground: '#c0ecd9'},
+                    { token: 'entity.class', foreground: '#c0ecd9'},
+                    { token: 'entity.class.lang', foreground: '#c0ecd9'},
+                    { token: 'entity.class.user', foreground: '#c0ecd9'},
+                    { token: 'entity.class.builtin', foreground: '#87d6bf'},
+                    { token: 'entity.variables.user', foreground: '#95c0d4'},
+                    { token: 'entity.functions', foreground: '#6de7e3' },
+                    { token: 'entity.flat', foreground: '#8886e3' },
+                    { token: 'entity.flat.number', foreground: '#8886e3' },
+                    { token: 'entity.flat.string', foreground: '#e3b986' },
+                    { token: 'comment', foreground: '#777777' },
+                ],
+                colors: {
+                    "editor.foreground": "#ffffff",
+                    "editor.background": "#1e1e1e"
+                }
+            });
+
+            const editor = monaco.editor.create(document.getElementById('container'), {
+                value: '',
+                language: 'myAsm', 
+                theme: 'myTheme',
+                automaticLayout: true,
+                fontSize: 14
+            });
+
+            monaco.languages.setMonarchTokensProvider('myAsm', {
+                        tokenizer: {
+                            root: [
+                                [/\/\/.*/, "comment"],
+                                [/"[^"]*"/, "entity.flat.string"],
+                                [/\b\d+\b/, "entity.flat.number"],
+                                [/\b(\w+)(\:)(\w+)/, ['entity.class.lang', '', 'keyword']],
+                                [/\b(interface|extends|classfunc|class)(\s+)([a-zA-Z_$][\w$]*)/, ['keyword', '', 'entity.class']],
+                                [/\b(arguments|extends|for|in|class|interface|return|classfunc|var|func|if|else)\b/, "keyword"],
+                                [/\b(Array|InternalDocsStrictEnum|Boolean|boolean|String|string|Number|number|Math|Object)\b/, "entity.class.lang"],
+                                [/\b(print)\b/, "entity.functions"],
+                                [/\b\w+\b(?=\()/, "entity.functions"],
+                                [/\bI\w+/, "entity.class"],
+                                [/\w+/, "entity.variables.user"],
+                                [/./, "entity.variables.user"]
+                            ]
+                        }
+                    });
+            });
+    </script>
+</body>
+</html>

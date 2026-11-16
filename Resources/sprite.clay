@@ -1,0 +1,14 @@
+
+// Sprite trait for the all in scene
+interface ISprite2 {
+    var Location: IPosition2;
+    var Size: IVector2;
+}
+
+classfunc Sprite2(Location, Size) extends ISprite2 {
+    var cls = Object();
+    cls.set("Location", Location);
+    cls.set("Size", Size);
+    return cls;
+}
+

@@ -1,0 +1,11 @@
+// Position of cordinates of a object of 2d
+interface IVector2 {
+    var X: number;
+    var Y: number;
+}
+
+// Position of a object of 2d
+interface IPosition2 extends IVector2 {
+    var Direction: number;
+    var Velocity: IVector2;
+}

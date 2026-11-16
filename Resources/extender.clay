@@ -1,0 +1,46 @@
+var PI = Number("3.141592653589793");
+var Tau = Math.mul(PI, 2);
+
+// List function for extends the Array
+classfunc List() {
+    var object = Object();
+    var __claicySmarty = Object();
+
+    object.set("length", 0);
+
+    object.set("push", func(object2, item) {
+        object2.set(repr(object2.length), item);
+        object2.set("length", Math.add(object2.length, 1));
+    });
+    object.set("pop", func(object2) {
+        object2.set("length", Math.sub(object2.length, 1));
+        return object2.get(repr(object2.length));
+    });
+
+    object.set("map", func(object2, fn) {
+        var net = List();
+        var prop = Object();
+        prop.set("index", 0);
+
+        for v in object2 {
+            net.push(net, fn(v, prop.index));
+            prop.set("index", Math.add(prop.index, 1));
+        }
+
+        return net;
+    });
+
+    __claicySmarty.set("iterator", func(object2,index) {
+        return object2.get(repr(index));
+    });
+    __claicySmarty.set("length", func(object2) {
+        return object2.length;
+    });
+    object.set("__claicySmarty",__claicySmarty);
+
+    for v in arguments {
+        object.push(object, v);
+    }
+
+    return object;
+}

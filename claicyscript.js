@@ -268,6 +268,7 @@ function parse(tokens) {
     if (token.type === "string") {
       node = { type: "String", value: token.value };
     }
+    let parent;
     while (peek() && peek().value === ".") {
       consume();
       let prop = consume();
@@ -275,6 +276,19 @@ function parse(tokens) {
         type: "Member",
         object: node,
         property: prop.value
+      };
+      parent = node.object;
+    }
+    let acessTo = null;
+    if (peek() && peek().value === ":") {
+      consume();
+      acessTo = consume().value;
+      if (!parent)
+        parent = node;
+      node = {
+        type: "Member",
+        object: node,
+        property: acessTo
       };
     }
     if (peek()?.value === "(") {
@@ -287,7 +301,9 @@ function parse(tokens) {
       }
       expect(")");
       return {
-        type: "Call",
+        type: acessTo !== null ? "CallMethod" : "Call",
+        parent,
+        acessTo,
         callee: node,
         args
       };
@@ -424,16 +440,23 @@ async function run(ast, globalSymbolsP, makeOne = false) {
     }
     if (!(typeof callee === "object" && "type" in callee))
       throw new Error("no callable function");
+    let localScope = {};
+    for (let [k, v] of Object.entries(currentScope)) {
+      localScope[k] = v;
+    }
     if (callee.type === "userFunc") {
       if (!("params" in callee && Array.isArray(callee.params)))
         throw new Error("no callable function");
-      let localScope = {};
       for (let i = 0; i < callee.params.length; i++) {
         localScope[callee.params[i]] = args[i];
       }
-      for (let [k, v] of Object.entries(currentScope)) {
-        localScope[k] = v;
-      }
+      localScope.arguments = { type: "obj", object: {
+        __claicySmarty: { type: "obj", object: {
+          iterator: { type: "func", func: (params) => args[Number(params[1])] },
+          length: { type: "func", func: (params) => args.length }
+        } },
+        "_functor_": { type: "func", func: (params) => args[Number(params[0])] }
+      } };
       let vale;
       try {
         vale = await recursiveInterprete(callee.body, localScope);
@@ -486,7 +509,7 @@ async function run(ast, globalSymbolsP, makeOne = false) {
     }
     if ("func" in callee && typeof callee.func == "function") {
       let vale;
-      vale = await callee.func(args);
+      vale = await callee.func(args, localScope);
       return vale;
     }
     console.error("No es funci\xF3n:", callee);
@@ -541,9 +564,20 @@ async function run(ast, globalSymbolsP, makeOne = false) {
     }
     if (node.type === "String")
       return node.value;
-    if (node.type === "Call") {
+    if (node.type === "Call" || node.type == "CallMethod") {
       let callee = await evalExpr(node.callee, currentScope);
-      const evaluatedArgs = await Promise.all(node.args.map((v) => evalExpr(v, currentScope)));
+      let callme = [
+        ...node.type === "CallMethod" ? [await evalExpr(node.parent, currentScope)] : []
+      ];
+      if (CSTypeChecker.isCSObject(callee)) {
+        if ("_functor_" in callee.object && (CSTypeChecker.isCSUserFunction(callee.object._functor_) || CSTypeChecker.isCSFunction(callee.object._functor_))) {
+          let evaluatedArgs2 = await Promise.all(node.args.map((v) => evalExpr(v, currentScope)));
+          evaluatedArgs2 = [...callme, callee, ...evaluatedArgs2];
+          return await callFunc(callee, evaluatedArgs2, currentScope);
+        }
+      }
+      let evaluatedArgs = await Promise.all(node.args.map((v) => evalExpr(v, currentScope)));
+      evaluatedArgs = [...callme, ...evaluatedArgs];
       return await callFunc(callee, evaluatedArgs, currentScope);
     }
     return Boolean();
@@ -689,32 +723,74 @@ function exportLibrary(isGlobal = false) {
     console.log(...params.map((v) => globalSymbols.repr.func([v])));
     return 0;
   } };
+  const casterForUserFast = async (search, params, scope) => {
+    const [a, b] = params;
+    if (CSTypeChecker.isCSObject(a)) {
+      let fun = a.object[search] ?? Boolean(false);
+      let fnRun = (await run([], {}, true)).callFunc;
+      if ((CSTypeChecker.isCSFunction(fun) || CSTypeChecker.isCSUserFunction(fun)) && typeof scope === "object") {
+        return await fnRun(fun, params, scope);
+      }
+    }
+    return null;
+  };
   globalSymbols.Math = { type: "obj", object: {
-    add: { type: "func", func: (params) => {
+    add: { type: "func", func: async (params, scope) => {
       const [a, b] = params;
+      const ab = await casterForUserFast("_add", params, scope);
+      ;
+      if (ab !== null)
+        return ab;
       if (typeof a === "number" && typeof b === "number")
         return a + b;
       if (typeof a === "string" && typeof b === "string")
         return a + b;
       throw new TypeError("Math.add expects number or string");
     } },
-    sub: { type: "func", func: (params) => {
+    sub: { type: "func", func: async (params, scope) => {
       const [a, b] = params;
+      const ab = await casterForUserFast("_sub", params, scope);
+      ;
+      if (ab !== null)
+        return ab;
       if (typeof a === "number" && typeof b === "number")
         return a - b;
       throw new TypeError("Math.sub expects number");
     } },
-    div: { type: "func", func: (params) => {
+    div: { type: "func", func: async (params, scope) => {
       const [a, b] = params;
+      const ab = await casterForUserFast("_div", params, scope);
+      ;
+      if (ab !== null)
+        return ab;
       if (typeof a === "number" && typeof b === "number")
         return a / b;
       throw new TypeError("Math.div expects number");
     } },
-    mul: { type: "func", func: (params) => {
+    mul: { type: "func", func: async (params, scope) => {
       const [a, b] = params;
+      const ab = await casterForUserFast("_mul", params, scope);
+      ;
+      if (ab !== null)
+        return ab;
       if (typeof a === "number" && typeof b === "number")
         return a * b;
       throw new TypeError("Math.mul expects number");
+    } },
+    boolAnd: { type: "func", func: (params, scope) => {
+      return params[0] && params[1];
+    } },
+    boolOr: { type: "func", func: (params, scope) => {
+      return params[0] || params[1];
+    } },
+    greater: { type: "func", func: (params, scope) => {
+      return params[0] > params[1];
+    } },
+    less: { type: "func", func: (params, scope) => {
+      return params[0] < params[1];
+    } },
+    boolNot: { type: "func", func: (params, scope) => {
+      return !params[0];
     } }
   } };
   globalSymbols.Boolean = createEnum("Boolean", [true, false]);

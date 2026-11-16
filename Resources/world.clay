@@ -1,0 +1,10 @@
+// World object the main root and primitive
+interface IWorld {
+    var Gravity: number;
+}
+
+// Stage is the main object of a game
+interface IStage extends IWorld {
+    
+}
+
